@@ -1,0 +1,17 @@
+import sys
+import math
+from PIL import Image
+
+def main(kwargs):
+  '''im = Image.new("RGB", (512, 512), "white")
+  im.paste((255,0,0),(0,0,100,100))
+  im.show()'''
+  count = 0
+  for n in range(16):
+    x = count%4
+    y = math.floor(count/4)
+    print x,y
+    count+=1
+
+if __name__ == "__main__":
+  main(sys.argv)
