@@ -24,9 +24,9 @@ def get_distinct_colors(co,th,mn,mx):
   for c in co:
     same = False
     if not color_difference(c,(0,0,0),mn):
-      pass
+      continue
     if not color_difference(c,(255,255,255),mx):
-      pass
+      continue
     for k in colors:
       if not color_difference(c,k,th):
 	same = True
@@ -35,7 +35,23 @@ def get_distinct_colors(co,th,mn,mx):
       colors.append(c)
   return colors
     
-
+def get_extremes(v,c):
+  start = 255-v
+  r = start
+  count = 0
+  i = 0
+  for cs in c:
+    ca = (cs[0]+cs[1]+cs[2])/3
+    if start > 0:
+      if ca < r:
+        r = ca
+        i=count
+    else:
+      if ca > r:
+        r = ca
+        i=count
+    count+=1
+  return i
 
 def main(kwargs):
   #terminal output init
@@ -79,29 +95,40 @@ def main(kwargs):
   distinct_colors = get_distinct_colors(colors,threshold,min_brightness,max_brightness)
   #ensure there are 16
   count = 0
-  while len(distinct_colors)<16:
+  nc = 18 #number of colors
+  while len(distinct_colors)<nc:
     count+=1
     distinct_colors.extend(get_distinct_colors(colors,threshold-count,min_brightness,max_brightness))
     if count == threshold:
       print "could not get colors from image with settings specified, Aborting.\n"
       return
-  if len(distinct_colors)>16:
-    del distinct_colors[16:]
+  if len(distinct_colors)>nc:
+    del distinct_colors[nc:]
+
+  #get the darkest and lightest color
+  darkest_i = get_extremes(0,distinct_colors)
+  darkest = distinct_colors[darkest_i]
+  del distinct_colors[darkest_i]
+  lightest_i = get_extremes(255,distinct_colors)
+  lightest = distinct_colors[lightest_i]
+  del distinct_colors[lightest_i]
 
   #display
   if display:
-    im = Image.new("RGB", (512, 512), "black")
+    margin = 16
+    im = Image.new("RGB", (512+(margin*2), 512+(margin*2)), darkest)
     sq = 128
     count = 0
     for c in distinct_colors:
-      x = (count%4)*sq
-      y = (count/4)*sq
+      x = ((count%4)*sq)+margin
+      y = ((count/4)*sq)+margin
       im.paste(c,(x,y,x+sq,y+sq))
       count+=1
+    im.paste(lightest,(margin*2,margin*2,margin*4,margin*4))
     im.show()
       
   #output
-  print out.output(distinct_colors)
+  print out.output(distinct_colors,lightest,darkest)
 
 
 if __name__ == "__main__":
