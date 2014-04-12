@@ -1,4 +1,5 @@
 import subprocess
+#import shlex
 class output:
 
   terminals = ['gnome']
@@ -9,9 +10,9 @@ class output:
     self.use = terminal
     self.valid = terminal in self.terminals
 
-  def output(self,colors):
+  def output(self,colors,l,d):
     method = getattr(self,'print'+self.use)
-    s = method(colors)
+    s = method(colors,l,d)
     return s
 
   #----------
@@ -29,7 +30,7 @@ class output:
 
   #---------
 
-  def printgnome(self,colors):
+  def printgnome(self,colors,l,d):
     # ~/.gconf/apps/gnome-terminal/profiles/Default/%gconf.xml
     '''#default pallette : 
       #2E2E34343636:#CCCC00000000:#4E4E9A9A0606:#C4C4A0A00000:#34346565A4A4:#757550507B7B:#060698209A9A:#D3D3D7D7CFCF:
@@ -47,13 +48,21 @@ class output:
     for c in colors:
       cc = self.rgb_to_hex(self.rgb8_to_rgb16(c))
       s+=cc+":"
+    lb=self.rgb_to_hex(self.rgb8_to_rgb16(l))
+    db=self.rgb_to_hex(self.rgb8_to_rgb16(d))
 
     cm = "gconftool-2 -s -t string /apps/gnome-terminal/profiles/Default/"
     fcm = cm+"palette /"+s[:-1].upper()
+
+    fcm+= '\n'+cm+"background_color /"+lb
+    fcm+= '\n'+cm+"foreground_color /"+db
+
+    #lex = shlex.shlex(fcm)
+    #lex.whitespace_split = True
 
     '''fcm+=cm+"background_color " + bgcolor
     fcm+=cm+"foreground_color_color " + fgcolor
     fcm+=cm+"bold_color " + bdcolor'''
     
-    #subprocess.call([fcm])
+    #subprocess.call([lex])
     return '\n'+fcm+'\n'
