@@ -2,6 +2,7 @@ schemer
 =======
 
 python port of /thefryscorer/schemer
+using python 2.7
 
 
 Run main.py
@@ -13,7 +14,8 @@ Example output color preview image:
 --
 
 ![alt tag](https://raw.github.com/ghidra/schemer/master/example_color_output.png)
-
+outside border is the darkest color, and used and the background color
+the little square in the top left if the lightest color, and used as the foreground color
 
 Example output command:
 --
